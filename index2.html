@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chỉ có một lựa chọn!</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            background-image: url('peak.jpg'); 
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            transition: background-image 0.5s ease-in-out; 
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        #page-1-content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            position: absolute; 
+            top: 15%; 
+            left: 50%;
+            transform: translateX(-50%); 
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 2.8rem; 
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+            margin: 0;
+        }
+
+        .button-group {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            gap: 20px; /* Thu nhỏ khoảng cách giữa 2 nút cho cân đối */
+        }
+
+        button {
+            padding: 10px 25px; /* Ô nút nhỏ lại */
+            font-size: 18px; /* Chữ trong nút nhỏ lại */
+            font-weight: bold;
+            border: none;
+            border-radius: 50px; /* Bo góc tròn nhiều hơn cho nữ tính/mềm mại */
+            cursor: pointer;
+            color: white;
+        }
+
+        #btn-yes {
+            /* Hiệu ứng màu gradient và bóng bẩy cho nút Có */
+            background: linear-gradient(135deg, #66bb6a 0%, #388e3c 100%);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4), inset 0 2px 2px rgba(255,255,255,0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #btn-yes:hover {
+            transform: scale(1.1) translateY(-2px); /* Bay nhẹ lên khi hover */
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6), inset 0 2px 2px rgba(255,255,255,0.5);
+        }
+
+        #btn-no {
+            /* Hiệu ứng màu gradient và bóng bẩy cho nút Không */
+            background: linear-gradient(135deg, #ef5350 0%, #c62828 100%);
+            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4), inset 0 2px 2px rgba(255,255,255,0.5);
+            transition: 0.1s ease-out;
+        }
+
+        /* --- CSS CHO TRANG 2 --- */
+        #page-2-content {
+            display: none; 
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+        }
+
+        .side-text {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 1.2rem; 
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+            /* Bóp chiều rộng khung chữ lại để chừa chỗ cho bạn nữ */
+            width: 28%; 
+            line-height: 1.6;
+        }
+
+        #text-left {
+            left: 5%;
+            text-align: left;
+        }
+
+        #text-right {
+            right: 5%;
+            /* Căn lề trái để text chạy mượt mắt hơn */
+            text-align: left; 
+        }
+
+        /* Chữ ký góc dưới cùng bên phải */
+        #signature {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            color: white;
+            font-size: 1.3rem;
+            font-style: italic;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        /* HIỆU ỨNG TRÁI TIM RƠI */
+        .heart {
+            position: fixed;
+            top: -10vh;
+            color: #ff4d4d;
+            font-size: 24px;
+            z-index: 5; 
+            animation: fall linear forwards;
+            pointer-events: none; 
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh); 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <div id="page-1-content">
+        <h1>Em yêu anh như nàooooooo?</h1>
+        <div class="button-group">
+            <button id="btn-yes">Yêu nhiều nhắm nhắm nhắm nun ó >.<</button>
+            <button id="btn-no">Bình thường</button>
+        </div>
+    </div>
+
+    <div id="page-2-content">
+        <div class="side-text" id="text-left"></div>
+        <div class="side-text" id="text-right"></div>
+        
+        <div id="signature">From Duy Anh with love ❤️</div>
+    </div>
+
+    <script>
+        // --- XỬ LÝ NÚT KHÔNG CHẠY TRỐN ---
+        const btnNo = document.getElementById('btn-no');
+
+        function moveButton() {
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const btnWidth = btnNo.offsetWidth;
+            const btnHeight = btnNo.offsetHeight;
+
+            const padding = 50; 
+            const maxX = windowWidth - btnWidth - padding;
+            const maxY = windowHeight - btnHeight - padding;
+
+            const randomX = Math.max(padding, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(padding, Math.floor(Math.random() * maxY));
+
+            btnNo.style.position = 'fixed';
+            btnNo.style.left = randomX + 'px';
+            btnNo.style.top = randomY + 'px';
+        }
+
+        btnNo.addEventListener('mouseenter', moveButton);
+        btnNo.addEventListener('touchstart', function(e) {
+            e.preventDefault(); 
+            moveButton();
+        });
+
+        // --- XỬ LÝ KHI BẤM NÚT CÓ ---
+        const btnYes = document.getElementById('btn-yes');
+        const page1 = document.getElementById('page-1-content');
+        const page2 = document.getElementById('page-2-content');
+
+        const textL = "Nhân ngày mùng 8 tháng 3, anh xin chúc người con gái anh yêu luôn xinh đẹp, vui tươi, hạnh phúc ❤️🌹. Chúc cho em luôn mạnh mẽ, kiên cường và nhẫn nại vượt qua mọi khó khăn trong cuộc sống để hoàn thành được hoài bão của mình ✨🥰.";
+        const textR = "Anh cảm ơn em vì suốt khoảng thời gian qua đã luôn đồng hành bên cạnh anh; động viên, thấu hiểu và ủng hộ những lúc anh gặp khó khăn, an ủi những lúc anh buồn 🥺💞. Anh chúc em cũng như chúng mình trong tương lai sẽ yêu thương nhau nhiều hơn, sẽ có thêm nhiều kỉ niệm đẹp, hạnh phúc và niềm vui bên nhau hơn nữaaa 👩‍❤️‍👨💖. Anh yêu bé nhiều lắmmmmmm :3 :> 💘";
+
+        const contentLeft = [...textL];
+        const contentRight = [...textR];
+        
+        const typingSpeed = 40; 
+
+        function typeWriter(textArray, elementId, index, callback) {
+            if (index < textArray.length) {
+                document.getElementById(elementId).innerHTML += textArray[index];
+                setTimeout(() => typeWriter(textArray, elementId, index + 1, callback), typingSpeed);
+            } else {
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        }
+
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️';
+            
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+            heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+
+            page2.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }
+
+        btnYes.addEventListener('click', function() {
+            page1.style.display = 'none';
+
+            document.body.style.backgroundImage = "url('grass field.jpg')";
+
+            page2.style.display = 'block';
+
+            typeWriter(contentLeft, 'text-left', 0, function() {
+                typeWriter(contentRight, 'text-right', 0);
+            });
+
+            setInterval(createHeart, 300);
+        });
+    </script>
+</body>
+</html>
